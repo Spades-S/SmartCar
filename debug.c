@@ -1,5 +1,5 @@
 #include "debug.h"
-uint8 CCD_Draw_Buff[150]={0};
+
 uint8 Page_Index=0,Para_Index=0,Para_Checked=0,Para_Choice=0;
 uint8 Display_Edge=1;
 uint8 Step_Index=2;
@@ -256,7 +256,7 @@ void If_Button_Press(void)
               
               
               ////////////////////save e2prom
-              DebugData_Save();
+              //DebugData_Save();
               OLED_PrintValueI(72, 5,1);
           
           }

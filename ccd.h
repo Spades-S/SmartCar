@@ -6,6 +6,8 @@
 
 extern GPIO_InitTypeDef gpio_init_struct;
 extern ADC_InitTypeDef  adc_init_struct;
+extern uint8 Leftlastfind,Rightlastfind;
+extern int Right,Left;
 
 /*
 //宏定义数据线和时钟线

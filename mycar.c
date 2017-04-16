@@ -12,7 +12,10 @@ void main (void)
   Pit_Init();
   while(1)
   {
-
+     If_Button_Press();
+     OLED_Draw_UI();
+     Send_Begin();
+     Send_CCD();
   } 
 }
 
@@ -20,11 +23,11 @@ void main (void)
 void servo_angle_control( int angle) 
 {
   uint16 DutyRation = 0;
-  DutyRation = (uint16)(660 - angle*6.0);
-  if(DutyRation>=753) 
-  {DutyRation=753;}
-  if(DutyRation<=580)
-  { DutyRation=580;}
+  DutyRation = (uint16)(420 - angle*6.6);//5.7   6.4
+  if(DutyRation>=516) 
+  {DutyRation=516;}
+  if(DutyRation<=324)
+  { DutyRation=324;}
     
   LPLD_FTM_PWM_ChangeDuty(FTM2, FTM_Ch1, DutyRation);  //舵机角度控制//660
 }
@@ -33,7 +36,7 @@ void servo_angle_control( int angle)
 void pit_isr(void)
 {
   static uint8 part=0;
-  
+
   
   part+=1;
 
@@ -56,6 +59,7 @@ void pit_isr(void)
       
       break;
     case 4://道路识别
+      RoadType_Distinguish();
 
       break;
     case 5:
@@ -69,7 +73,9 @@ void pit_isr(void)
   
   
   }
-
+  
+  Motor_Output();
+  servo_angle_control(0-Middle_Err);
 }
 
 

@@ -4,8 +4,7 @@ uint8 CCD_Draw_Buff[150]={0};
 uint16 CCD_Buff[128] = { 0 };
 uint8  CCD_Offset=200;           //暗电压大小    单片机12位AD白色赛道亮度值在200-1200左右
 uint16 Max_Value=0;
-uint8 Leftlastfind,Rightlastfind;
-int Right,Left;
+
 float Brightness=0;
 
 

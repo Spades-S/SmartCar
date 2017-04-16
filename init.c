@@ -13,7 +13,7 @@ void Motor_Init(void)
         //电机模块的初始化
     ftm_init_struct.FTM_Ftmx = FTM0;
     ftm_init_struct.FTM_Mode = FTM_MODE_PWM;
-    ftm_init_struct.FTM_PwmFreq = 2500;
+    ftm_init_struct.FTM_PwmFreq = 15000;
     LPLD_FTM_Init(ftm_init_struct);
     
 
