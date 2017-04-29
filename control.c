@@ -8,9 +8,9 @@ float SetSpeed=0,Barraicade_Num=1;
 ****/
 void Motor_Output(void)
 {
-  LPLD_FTM_PWM_ChangeDuty(FTM0, FTM_Ch5,2800);
+  LPLD_FTM_PWM_ChangeDuty(FTM0, FTM_Ch5,2500);
     
-  LPLD_FTM_PWM_ChangeDuty(FTM0, FTM_Ch7,2800);    //1900 2500
+  LPLD_FTM_PWM_ChangeDuty(FTM0, FTM_Ch7,2500);    //1900 2500 2800
 }
 
 

@@ -9,12 +9,12 @@ char Para_Name[5][12]={"PID_SPEED.P\0",
 "PID_SPEED.I\0","PID_SPEED.D\0","PID_DIREC.P\0","PID_DIREC.I\0"};
 char Para_Name1[5][12]={"PID_DIREC.D\0","Brightness\0","K_Barrai\0","Correct_Err\0","K_CrossRoad\0"};
 char Para_Name2[3][12]={"SetSpeed\0","P_CrossRoad\0","SAVE\0"};
-char Para_Name3[2][12]={"Threshold\0","Braar_Num"};
+char Para_Name3[2][12]={"Threshold\0","CCDOffset"};
 //将PID变量的地址加到指针数组里
 float *Control_Para0[5]={&PID_Speed.P,&PID_Speed.I,&PID_Speed.D,&PID_Turn.P,&PID_Turn.I};
 float *Control_Para1[5]={&PID_Turn.D,&Brightness,&K_Barraicade,&Correct_Err,&K_CrossRoad};
 float *Control_Para2[2]={&SetSpeed,&P_CrossRoad};
-float *Control_Para3[2]={&Threshold,&Barraicade_Num};
+float *Control_Para3[2]={&Threshold,&CCD_Offset};
 /********绘制界面********/
 void OLED_Draw_UI()
 {

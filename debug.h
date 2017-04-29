@@ -26,7 +26,7 @@ extern PID PID_Speed,PID_Turn;
 extern float Middle_Err;//ÖÐÏßÆ«ÒÆÁ¿
 extern uint8 CCD_Draw_Buff[150];
 extern float SetSpeed,Barraicade_Num;
-extern float SetSpeed,Brightness;
+extern float SetSpeed,Brightness,CCD_Offset;
 extern float Threshold,Barraicade_Num;
 extern uint8 Leftlastfind,Rightlastfind;
 extern int Right,Left,Max_Peak;

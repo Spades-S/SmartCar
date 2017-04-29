@@ -23,7 +23,7 @@ void main (void)
 void servo_angle_control( int angle) 
 {
   uint16 DutyRation = 0;
-  DutyRation = (uint16)(420 - angle*6.6);//5.7   6.4
+  DutyRation = (uint16)(420 - angle*6.4);//5.7   6.4  6.6
   if(DutyRation>=516) 
   {DutyRation=516;}
   if(DutyRation<=324)

@@ -31,6 +31,12 @@ void RoadType_Distinguish(void){
   
   }
   
+  if(Right-Left <15){ //此时左右边线虽然找到，却不可用
+    Right = Rightlast;
+    Left = Leftlast;
+  
+  }
+  
     //将赛道信息写入发送数组
   CCD_Draw_Buff[128]=Left-1;
   CCD_Draw_Buff[129]=Right; 
@@ -94,7 +100,7 @@ void Normal(void){
     }
   
   }else{
-    if(Leftlastfind){//如果上次找到了左边线
+    if(Leftlastfind){//如果上次找到了左边线 
       if(FindNearest(LEFT,Leftlast)){
         Left=RisingEdge[RisingEdgeIndex];
         Leftlastfind=1;	
@@ -130,14 +136,15 @@ void Normal(void){
             }
             
             if(Rightlastfind==0&&rightfind==0){  //此时丢线，利用算法补线
-              Right=Left+Reference_Width;
+              //Right=Left+Reference_Width;
+              Right = 88;
 
             }
           
           }
           else{  //直接没有下降沿，丢线，进行补线
           
-            Right=Left+Reference_Width;
+            Right = 88;
           }
           
           
@@ -204,13 +211,15 @@ void Normal(void){
              }
              if(Leftlastfind==0&&leftfind==0){
              
-                Left=Right-Reference_Width;
+                //Left=Right-Reference_Width;
+               Left = 38;
 
              }
 
            }
            else{
-              Left=Right-Reference_Width;
+              //Left=Right-Reference_Width;
+              Left = 38;
            }
          
          }
@@ -274,26 +283,40 @@ void EdgeFind(void){
   for(i=3;i<128;i++)
   {
     CCD_Diff[i]=CCD_Buff[i]-CCD_Buff[i-3];
+
     if(ABS(CCD_Diff[i])>Max_Peak) Max_Peak=ABS(CCD_Diff[i]);//寻找差分值的峰值 
   }
-  for(i=4;i<127;i++)
+  for(i=38;i<88;i++)
   {
     if((CCD_Diff[i]>=CCD_Diff[i-1])&&(CCD_Diff[i]>CCD_Diff[i+1])&&(CCD_Diff[i]>Threshold)) //寻找正的峰值，左边线
     {
       if(RisingEdgeCnt<5)    
       { 
-       RisingEdge[RisingEdgeCnt]=i;
-       RisingEdgeCnt++;  
+      
+         RisingEdge[RisingEdgeCnt]=i;
+         RisingEdgeCnt++;
+     
+        
       }
     } 
     if((CCD_Diff[i]<CCD_Diff[i-1])&&(CCD_Diff[i]<=CCD_Diff[i+1])&&(CCD_Diff[i]<-Threshold))  //寻找负的峰值，右边线
     {
       if(FallingEdgeCnt<5)    
       {
-       FallingEdge[FallingEdgeCnt]=i;
-       FallingEdgeCnt++;
+        
+            FallingEdge[FallingEdgeCnt]=i;
+            FallingEdgeCnt++;
+     
+
       }
     }
+  }
+  if(RisingEdgeCnt==0){
+     RisingEdge[0]=38;
+  }
+  
+  if(FallingEdgeCnt==0){
+    FallingEdge[0]=88;
   }
 
 }
@@ -328,11 +351,11 @@ void Find_BothLine(void){
   {    
     for(j=10;j<80;j++)         
     {
-       if((CCD_Diff[j]>=CCD_Diff[j-1])&&(CCD_Diff[j]>CCD_Diff[j+1])&&(CCD_Diff[j]>Threshold)) //?°?ò?yμ?·??μ
+       if((CCD_Diff[j]>=CCD_Diff[j-1])&&(CCD_Diff[j]>CCD_Diff[j+1])&&(CCD_Diff[j]>Threshold)) 
       {
         for(i=j+1;i<=120;i++) 
         {
-          if((CCD_Diff[i]<CCD_Diff[i-1])&&(CCD_Diff[i]<=CCD_Diff[i+1])&&(CCD_Diff[i]<-Threshold))  //?°?ò?oμ?·??μ
+          if((CCD_Diff[i]<CCD_Diff[i-1])&&(CCD_Diff[i]<=CCD_Diff[i+1])&&(CCD_Diff[i]<-Threshold)) 
           {
             if(i-j>25)
             {
