@@ -9,7 +9,7 @@
 #define RANGE_NEAR 3 //寻找最靠近上次边线时的判定范围
 int Max_Peak = 0;
 float Threshold=35;//判定阈值
-int Reference_Width=45; 
+int Reference_Width=40; 
 
 int RisingEdgeIndex,FallingEdgeIndex;//寻找到的跳变沿index,FindBoundary 专属
 uint8 RisingEdgeCnt=0,FallingEdgeCnt=0,RisingEdge[5]={0},FallingEdge[5]={0};
@@ -24,14 +24,28 @@ float Correct_Err=0,K_Barraicade=0.5;;
 //区分赛道类型进行针对性控制
 void RoadType_Distinguish(void){
   EdgeFind();
+  /*
+  switch(RoadType){
+    case 0:
+      Normal(); //普通赛道
+      break;
+    case 1:
+      CrossRoad();  //十字路
+      break;
+    default:
+      Normal();  //普通赛道
+      break;
+  
+  }*/
   Normal();
+
   if(RoadType==1){
   
     LPLD_GPIO_Output_b(PTE, 10, 0);
   
   }
   
-  if(Right-Left <15){ //此时左右边线虽然找到，却不可用
+  if(Right-Left <10){ //此时左右边线虽然找到，却不可用
     Right = Rightlast;
     Left = Leftlast;
   
@@ -70,10 +84,19 @@ void RoadType_Distinguish(void){
 
 
 }
+void CrossRoad(void){
+  if(Rightlastfind==0 && Leftlastfind==0){ //正入十字
+    
+    
+    
+  } 
+
+
+}
 
 //对常规赛道的处理
 void Normal(void){
-  uint8 tempwidth=0;
+
   if(Leftlastfind==0&&Rightlastfind==0){  //如果上一次两条边线均未找到
     Find_BothLine();
     if(Leftlastfind==0&&Rightlastfind==0){
@@ -91,7 +114,7 @@ void Normal(void){
        else  Rightlastfind=0; 
        if(Leftlastfind&&Rightlastfind)
        {
-        if(Right<Left)
+        if(Right-Left<10)
         {
          Leftlastfind=0;
          Rightlastfind=0;
@@ -104,38 +127,20 @@ void Normal(void){
       if(FindNearest(LEFT,Leftlast)){
         Left=RisingEdge[RisingEdgeIndex];
         Leftlastfind=1;	
-        if(Rightlastfind==0){ //上次这次均找到了边线，上次找不到右边线
+        if(Rightlastfind==0){ //上次这次均找到了左边线，上次找不到右边线
           if(FallingEdgeCnt){
             for(FallingEdgeIndex=0;FallingEdgeIndex<FallingEdgeCnt;FallingEdgeIndex++){
-              rightfind =0;
-              if(FallingEdge[FallingEdgeIndex]>Left) {
-                tempwidth = FallingEdge[FallingEdgeIndex]-Left;
-                if(ABS(tempwidth-Reference_Width)>=2){
-                  if(tempwidth>Reference_Width){
-                    Reference_Width=Reference_Width+1;
-                  }   
-                  else{
-                    Reference_Width=Reference_Width-1;
-                  }
-                 Right=Left+Reference_Width;
-                 Rightlastfind = 0;                
-                }else{
+              if(FallingEdge[FallingEdgeIndex]>Left) {            
+                if(FallingEdge[FallingEdgeIndex]>75 && FallingEdge[FallingEdgeIndex]< 90){
                   Right=FallingEdge[FallingEdgeIndex];
-                  Rightlastfind=1;                  
-                
+                  Rightlastfind=1;
+                  break;
                 }
-                rightfind = 1;
-                break;
                 
-                
-              
               }
-              
-              
-              
             }
             
-            if(Rightlastfind==0&&rightfind==0){  //此时丢线，利用算法补线
+            if(Rightlastfind==0){  //此时丢线，利用算法补线
               //Right=Left+Reference_Width;
               Right = 88;
 
@@ -185,41 +190,31 @@ void Normal(void){
          if(Leftlastfind==0){
            if(RisingEdgeCnt>0){
              for(RisingEdgeIndex=RisingEdgeCnt-1;RisingEdgeIndex>=0;RisingEdgeIndex--){
-                leftfind=0;
+
                 if(RisingEdge[RisingEdgeIndex]<Right){
-                  tempwidth = Right-RisingEdge[RisingEdgeIndex];
-                  if (ABS(tempwidth-Reference_Width)>=2){
-                    if(tempwidth>Reference_Width){
-                      Reference_Width=Reference_Width+1;
-                    }else{
-                      Reference_Width=Reference_Width-1;
-                    }
-                     Left=Right-Reference_Width;
-                     Leftlastfind = 0;
-                  
-                  }else{
-                     Left=RisingEdge[RisingEdgeIndex];
-                     Leftlastfind=1;                  
+
+                   if(RisingEdge[RisingEdgeIndex]>42 && RisingEdge[RisingEdgeIndex]< 80){
+                      Left=RisingEdge[RisingEdgeIndex];
+                      Leftlastfind=1;
+                      break;
                   }
-                  leftfind=1;
-                  break;
                   
                   
                 
                 }
              
              }
-             if(Leftlastfind==0&&leftfind==0){
+             if(Leftlastfind==0){
              
-                //Left=Right-Reference_Width;
-               Left = 38;
+
+               Left = 42;
 
              }
 
            }
            else{
-              //Left=Right-Reference_Width;
-              Left = 38;
+
+              Left = 42;
            }
          
          }
@@ -253,12 +248,7 @@ void Normal(void){
     }
   
   
-   if(Rightlastfind&&Leftlastfind)
-   {
-     
-     Reference_Width=Right-Left; 
-     if(Reference_Width<35)Reference_Width=35;
-   }
+
   
   
   }
@@ -268,7 +258,7 @@ void Normal(void){
 }
 
 
-//寻找跳变沿
+//寻找跳变沿,边界线可能出现在这些跳变沿里
 void EdgeFind(void){
   int i = 0;//for 的下标
   //对各值进行初始化
@@ -286,7 +276,7 @@ void EdgeFind(void){
 
     if(ABS(CCD_Diff[i])>Max_Peak) Max_Peak=ABS(CCD_Diff[i]);//寻找差分值的峰值 
   }
-  for(i=38;i<88;i++)
+  for(i=4;i<127;i++)
   {
     if((CCD_Diff[i]>=CCD_Diff[i-1])&&(CCD_Diff[i]>CCD_Diff[i+1])&&(CCD_Diff[i]>Threshold)) //寻找正的峰值，左边线
     {
@@ -311,13 +301,6 @@ void EdgeFind(void){
       }
     }
   }
-  if(RisingEdgeCnt==0){
-     RisingEdge[0]=38;
-  }
-  
-  if(FallingEdgeCnt==0){
-    FallingEdge[0]=88;
-  }
 
 }
 
@@ -325,21 +308,21 @@ void EdgeFind(void){
 //同时寻找两条边线
 void Find_BothLine(void){       
   uint8 i=0,j=0,find=0;//find：是否同时找到了左右边线
-  for(j=60;j>20;j--)
+  for(j=55;j>35;j--)
   {
     if((CCD_Diff[j]>=CCD_Diff[j-1])&&(CCD_Diff[j]>CCD_Diff[j+1])&&(CCD_Diff[j]>Threshold)) //寻找正的峰值
     {
       break;
     }
   }
-  for(i=70;i<110;i++)
+  for(i=80;i<100;i++)
   {
     if((CCD_Diff[i]<CCD_Diff[i-1])&&(CCD_Diff[i]<=CCD_Diff[i+1])&&(CCD_Diff[i]<-Threshold))  //寻找负的峰值
     {
       break;
     }
   }
-  if(j>25&&i<105)
+  if(j>42&&i<89)
   {
     find=1;
     Left=j;
@@ -348,16 +331,17 @@ void Find_BothLine(void){
     Rightlastfind=1;  
   }
   else
-  {    
-    for(j=10;j<80;j++)         
+  {    /*
+    //把盖子去掉之后，感觉else里面的也没啥用，没有两边固定限制边线了
+    for(j=45;j<80;j++)         
     {
        if((CCD_Diff[j]>=CCD_Diff[j-1])&&(CCD_Diff[j]>CCD_Diff[j+1])&&(CCD_Diff[j]>Threshold)) 
       {
-        for(i=j+1;i<=120;i++) 
+        for(i=j+1;i<=90;i++) 
         {
           if((CCD_Diff[i]<CCD_Diff[i-1])&&(CCD_Diff[i]<=CCD_Diff[i+1])&&(CCD_Diff[i]<-Threshold)) 
           {
-            if(i-j>25)
+            if(i-j>15)
             {
                find=1;
                Left=j;
@@ -370,7 +354,7 @@ void Find_BothLine(void){
         }
       }
       if(find) break;
-    } 
+    } */
   }
   if(find==0){
     Leftlastfind=0;
@@ -387,7 +371,7 @@ uint8 Find_Boundary(uint8 mode){
     { 
       for(RisingEdgeIndex=RisingEdgeCnt-1;RisingEdgeIndex>=0;RisingEdgeIndex--)
       {
-         if(RisingEdge[RisingEdgeIndex]<75)
+         if(RisingEdge[RisingEdgeIndex]<80 && RisingEdge[RisingEdgeIndex] > 42 )
          {
            find=1;
            break;
@@ -399,7 +383,7 @@ uint8 Find_Boundary(uint8 mode){
     {
      for(FallingEdgeIndex=0;FallingEdgeIndex<FallingEdgeCnt;FallingEdgeIndex++)
      {
-      if(FallingEdge[FallingEdgeIndex]>53)
+      if(FallingEdge[FallingEdgeIndex]>53  && FallingEdge[FallingEdgeIndex]< 89)
       {
        find=1;
        break;
@@ -422,7 +406,7 @@ uint8 FindNearest(uint8 mode, uint8 lastedge){
      {
       for(RisingEdgeIndex=0;RisingEdgeIndex<RisingEdgeCnt;RisingEdgeIndex++)
       {
-       if(ABS(lastedge-RisingEdge[RisingEdgeIndex])<=RANGE_NEAR)
+       if(ABS(lastedge-RisingEdge[RisingEdgeIndex])<=RANGE_NEAR  && RisingEdge[RisingEdgeIndex]<80 && RisingEdge[RisingEdgeIndex] > 40)
        {
          find=1;
          break;
@@ -435,7 +419,7 @@ uint8 FindNearest(uint8 mode, uint8 lastedge){
     {
      for(FallingEdgeIndex=0;FallingEdgeIndex<FallingEdgeCnt;FallingEdgeIndex++)
      {
-       if(ABS(lastedge-FallingEdge[FallingEdgeIndex])<=RANGE_NEAR)
+       if(ABS(lastedge-FallingEdge[FallingEdgeIndex])<=RANGE_NEAR  && FallingEdge[FallingEdgeIndex]>53  && FallingEdge[FallingEdgeIndex]< 89)
        {
          find=1;
          break;
